@@ -50,13 +50,16 @@ async def on_command_error(ctx, error):
         print('Unhandled exception in command {}:'.format(ctx.command), file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
-if __name__ == "__main__":
+async def main():
     for extension in [f"{COGS_DIR}.{x[:-len('.py')]}" for x in os.listdir(COGS_DIR) if x.endswith(".py")]:
         try:
-            client.load_extension(extension)
+            await client.load_extension(extension)
             print('Loaded extension \"{}\"'.format(extension))
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension \"{}\"\n{}'.format(extension, exc))
+
+if __name__ == "__main__":
+    asyncio.run(main())
 
 client.run(TOKEN)
