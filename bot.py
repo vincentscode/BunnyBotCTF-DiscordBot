@@ -9,8 +9,7 @@ from BunnyBotCTF import BunnyBotCTF
 
 logger = logging.getLogger('discord')
 logger.setLevel(level=logging.INFO)
-handler = RotatingFileHandler(filename='weird-birb.log', mode='a', maxBytes=1024 * 1024 * 5, backupCount=2,
-                              encoding='utf-8')
+handler = RotatingFileHandler(filename='bunny-bot.log', mode='a', maxBytes=1024 * 1024 * 5, backupCount=2, encoding='utf-8')
 # logging pattern:  "^(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d{3})\s(\S*)\s*(\w*)\s*(.*)$"
 # time pattern:     "yyyy-MM-dd HH:mm:ss,SSS"
 # line pattern:     "^\d"
