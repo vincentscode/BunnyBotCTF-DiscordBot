@@ -17,8 +17,9 @@ class BunnyBotCTF(commands.Bot):
 
         # match is nicer but needs python 3.10
         match error:
+            # ignored
             case commands.CommandNotFound():
-                ctx.send(f"peepee: {error.param}")
+                return
 
             case commands.DisabledCommand():
                 await ctx.send(f"{ctx.command} has been disabled.")
