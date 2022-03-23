@@ -1,16 +1,31 @@
-import discord
 import asyncio
-from discord import Game
-from discord.ext import commands
-from discord.ext.commands import Bot
-from discord.utils import get
+import logging
+from logging.handlers import RotatingFileHandler
+from os.path import exists
+import discord
 import json
-import os
-import traceback
-import sys
+
+from BunnyBotCTF import BunnyBotCTF
+
+logger = logging.getLogger('discord')
+logger.setLevel(level=logging.INFO)
+handler = RotatingFileHandler(filename='weird-birb.log', mode='a', maxBytes=1024 * 1024 * 5, backupCount=2,
+                              encoding='utf-8')
+# logging pattern:  "^(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d{3})\s(\S*)\s*(\w*)\s*(.*)$"
+# time pattern:     "yyyy-MM-dd HH:mm:ss,SSS"
+# line pattern:     "^\d"
+handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(name)-15s %(message)s'))
+logger.addHandler(handler)
+
+config_path = './config.json'
+
+if not exists(config_path):
+    print("no config.json file")
+    logger.log(logging.ERROR, "no config.json file")
+    exit(1)
 
 # load config
-with open('config.json', 'r') as f:
+with open(config_path, 'r') as f:
     config = json.load(f)
 
 TOKEN = config['token']
@@ -19,45 +34,13 @@ COGS_DIR = "cogs"
 
 # define bot
 intents = discord.Intents().all()
-intents.message_content = True
-client = commands.Bot(command_prefix=PREFIX, intents=intents)
+bot_client = BunnyBotCTF(command_prefix=PREFIX, intents=intents)
 
-# events
-@client.event
-async def on_ready():
-    await client.change_presence(activity=Game(name="a CTF!"))
-    print(f"Logged in as {client.user.name} ({client.user.id})")
 
-@client.event
-async def on_command_error(ctx, error):
-    error = getattr(error, 'original', error)
+async def main():
+    async with bot_client:
+        await bot_client.load_extensions(COGS_DIR)
+        await bot_client.start(TOKEN)
 
-    ignored = (commands.CommandNotFound, )
-    if isinstance(error, ignored):
-        return
 
-    if isinstance(error, commands.DisabledCommand):
-        await ctx.send(f"{ctx.command} has been disabled.")
-
-    elif isinstance(error, commands.NoPrivateMessage):
-        await ctx.author.send(f"{ctx.command} can not be used in Private Messages.")
-
-    elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send(f"Missing argument: {error.param}")
-
-    elif isinstance(error, commands.ChannelNotFound):
-        await ctx.send(f"Channel or Category not found: {error.argument}")
-
-    else:
-        print('Unhandled exception in command {}:'.format(ctx.command), file=sys.stderr)
-        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
-
-for extension in [f"{COGS_DIR}.{x[:-len('.py')]}" for x in os.listdir(COGS_DIR) if x.endswith(".py")]:
-    try:
-        client.load_extension(extension)
-        print('Loaded extension \"{}\"'.format(extension))
-    except Exception as e:
-        exc = '{}: {}'.format(type(e).__name__, e)
-        print('Failed to load extension \"{}\"\n{}'.format(extension, exc))
-
-client.run(TOKEN)
+asyncio.run(main())

@@ -1,11 +1,9 @@
+import os
 import discord
-import asyncio
-import json
-import time
 import datetime
 from discord.ext import commands
-from discord.ext.commands import Bot
 from discord.utils import find
+
 
 class Archive(commands.Cog):
     def __init__(self, client):
@@ -18,8 +16,9 @@ class Archive(commands.Cog):
 
         guild: discord.Guild = ctx.guild
         archive_category: discord.CategoryChannel = find(lambda c: c.name.lower() == "archive", guild.categories)
-        archive_channel: discord.TextChannel = await guild.create_text_channel(category.name, category=archive_category, reason="archive")
-        
+        archive_channel: discord.TextChannel = await guild.create_text_channel(category.name, category=archive_category,
+                                                                               reason="archive")
+
         await archive_channel.send(f"Archived at {datetime.datetime.now()}")
 
         e = discord.Embed()
@@ -27,8 +26,11 @@ class Archive(commands.Cog):
         e.description = "```"
         for t in category.text_channels[::-1]:
             print(" > ", t.name)
-            t_thread: discord.Thread = await archive_channel.create_thread(name=t.name, type=discord.ChannelType.public_thread, reason="archive")
-            t_history = await t.history(limit=None).flatten()
+            t_thread: discord.Thread = await archive_channel.create_thread(name=t.name,
+                                                                           auto_archive_duration=60,
+                                                                           type=discord.ChannelType.public_thread,
+                                                                           reason="archive")
+            t_history = [message async for message in t.history(limit=None)]
 
             msg: discord.Message
             for msg in t_history[::-1]:
@@ -39,8 +41,9 @@ class Archive(commands.Cog):
 
                 files = []
                 for at in msg.attachments:
-                    await at.save(fp="cache/" + at.filename)
-                    files.append(discord.File("cache/" + at.filename, filename=at.filename))
+                    attachment_path = os.path.join("./cache/", at.filename)
+                    await at.save(fp=attachment_path)
+                    files.append(discord.File(attachment_path, filename=at.filename))
 
                 await t_thread.send(embed=msg_embed, files=files)
             e.description += f" - {t.name} ({t.id}) => {len(t_history)} messages\n"
@@ -48,12 +51,12 @@ class Archive(commands.Cog):
             if delete:
                 await t.delete(reason="archive")
         e.description += "```"
-        
+
         if delete:
             await category.delete(reason="archive")
 
         await ctx.send(embed=e)
-        
 
-def setup(client):
-    client.add_cog(Archive(client))
+
+async def setup(client):
+    await client.add_cog(Archive(client))

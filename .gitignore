@@ -1,6 +1,9 @@
 # Project specific
 config.json
 
+# ide specific
+.idea
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
