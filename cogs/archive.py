@@ -42,7 +42,10 @@ class Archive(commands.Cog):
                     await at.save(fp="cache/" + at.filename)
                     files.append(discord.File("cache/" + at.filename, filename=at.filename))
 
-                await t_thread.send(embed=msg_embed, files=files)
+                try:
+                    await t_thread.send(embed=msg_embed, files=files)
+                except Exception as ex:
+                    await t_thread.send("Failed to archive message:\n" + str(ex))
             e.description += f" - {t.name} ({t.id}) => {len(t_history)} messages\n"
 
             if delete:
