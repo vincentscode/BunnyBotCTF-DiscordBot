@@ -15,7 +15,8 @@ class Archive(commands.Cog):
 
         guild: discord.Guild = ctx.guild
         archive_category: discord.CategoryChannel = find(lambda c: c.name.lower() == "archive", guild.categories)
-        archive_channel: discord.TextChannel = await guild.create_text_channel(category.name, category=archive_category,
+        archive_channel: discord.TextChannel = await guild.create_text_channel(name=category.name,
+                                                                               category=archive_category,
                                                                                reason="archive")
 
         await archive_channel.send(f"Archived at {datetime.datetime.now()}")
