@@ -1,5 +1,3 @@
-import os.path
-
 import discord
 import datetime
 from discord.ext import commands
@@ -17,8 +15,7 @@ class Archive(commands.Cog):
 
         guild: discord.Guild = ctx.guild
         archive_category: discord.CategoryChannel = find(lambda c: c.name.lower() == "archive", guild.categories)
-        archive_channel: discord.TextChannel = await guild.create_text_channel(category.name,
-                                                                               category=archive_category,
+        archive_channel: discord.TextChannel = await guild.create_text_channel(category.name, category=archive_category,
                                                                                reason="archive")
 
         await archive_channel.send(f"Archived at {datetime.datetime.now()}")
@@ -42,12 +39,13 @@ class Archive(commands.Cog):
 
                 files = []
                 for at in msg.attachments:
-                    attachment_path = os.path.join("cache", at.filename)
-                    await at.save(fp=attachment_path)
-                    at.read()
-                    files.append(discord.File(attachment_path, filename=at.filename))
+                    await at.save(fp="cache/" + at.filename)
+                    files.append(discord.File("cache/" + at.filename, filename=at.filename))
 
-                await t_thread.send(embed=msg_embed, files=files)
+                try:
+                    await t_thread.send(embed=msg_embed, files=files)
+                except Exception as ex:
+                    await t_thread.send("Failed to archive message:\n" + str(ex))
             e.description += f" - {t.name} ({t.id}) => {len(t_history)} messages\n"
 
             if delete:

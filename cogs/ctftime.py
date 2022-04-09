@@ -1,11 +1,12 @@
 from typing import List, Dict
 
 import discord
-from discord import InteractionType
 from discord.ext import commands
 import requests
-from datetime import datetime
+import datetime as dt
 from dataclasses import dataclass
+import pytz
+from tzlocal import get_localzone
 
 
 @dataclass
@@ -16,8 +17,8 @@ class CTFTimeEvent:
     challenge_format: str
     restrictions: str
     organizer_list: List[Dict[str, str | int]]
-    start_date: datetime
-    end_date: datetime
+    start_date: dt.datetime
+    end_date: dt.datetime
     logo: str
     weight: int
     url: str
@@ -30,12 +31,21 @@ class CTFTime(commands.Cog):
 
     @commands.command("CTFinfo")
     async def ctf_info(self, ctx: commands.Context,
-                       event_id_or_url: int | str):
+                       event_id_or_url: int | str, local_timezone: str = "CET"):
 
         event_id = extract_id(event_id_or_url)
 
         if event_id > 0:
             ce = retrieve_ctftime_event(event_id)
+
+            try:
+                tz_object = pytz.timezone(local_timezone)
+            except pytz.UnknownTimeZoneError:
+                await ctx.send("unknown timezone")
+                tz_object = pytz.timezone("UTC")
+
+            ce.start_date = ce.start_date.astimezone(tz_object)
+            ce.end_date = ce.end_date.astimezone(tz_object)
 
             e = discord.Embed()
             e.title = f"**{ce.title}** ({ce.weight}) by {', '.join([o.get('name') for o in ce.organizer_list])}"
@@ -59,7 +69,14 @@ class CTFTime(commands.Cog):
             f: discord.ScheduledEvent
             event = discord.utils.find(lambda e: e.name == ce.title, ctx.guild.scheduled_events)
             if not event:
-                # TODO check if event begin/end is before now and do stuff because of that
+
+                # safety checks
+                now = round_to_next_15_minutes(dt.datetime.now().astimezone(get_localzone()))
+                if ce.start_date < now:
+                    ce.start_date = now
+                if ce.end_date < now:
+                    ce.end_date = now
+
                 await ctx.guild.create_scheduled_event(name=ce.title,
                                                        description=ce.description,
                                                        start_time=ce.start_date,
@@ -70,6 +87,11 @@ class CTFTime(commands.Cog):
 
         else:
             await ctx.send("oops something went wrong")
+
+
+def round_to_next_15_minutes(t: dt.datetime) -> dt.datetime:
+    td = dt.timedelta(minutes=15)
+    return t.replace(microsecond=0, second=0, minute=(t.minute // 15) * 15) + td
 
 
 def retrieve_ctftime_event(event_id: int) -> CTFTimeEvent:
@@ -86,8 +108,8 @@ def retrieve_ctftime_event(event_id: int) -> CTFTimeEvent:
         challenge_format=data.get("format", "unknown"),
         restrictions=data.get('restrictions', 'Open probably'),
         organizer_list=data.get('organizers', [{"id": -1, "name": "unknown"}]),
-        start_date=datetime.fromisoformat(start_date_str),
-        end_date=datetime.fromisoformat(end_date_str),
+        start_date=dt.datetime.fromisoformat(start_date_str),
+        end_date=dt.datetime.fromisoformat(end_date_str),
         logo=data.get("logo"),
         weight=data.get('weight', 0),
         ctftime_url=data.get("ctftime_url", api_url),
@@ -102,13 +124,10 @@ def extract_id(event_id_or_url: int | str) -> int:
             event_id = int(event_id_or_url.split("/")[-1])
         case int():
             event_id = event_id_or_url
+        case _:
+            event_id = -1
 
     return event_id
-
-
-# TODO either implement or remove
-def get_discord_link(url: str) -> str | None:
-    response = requests.get(url)
 
 
 def setup(client):
