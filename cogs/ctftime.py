@@ -79,8 +79,8 @@ class CTFTime(commands.Cog):
 
                 await ctx.guild.create_scheduled_event(name=ce.title,
                                                        description=ce.description,
-                                                       start_time=ce.start_date,
-                                                       end_time=ce.end_date,
+                                                       start_time=round_to_next_15_minutes(ce.start_date),
+                                                       end_time=round_to_next_15_minutes(ce.end_date),
                                                        location=ce.url)
             else:
                 await ctx.send("event already exists")
