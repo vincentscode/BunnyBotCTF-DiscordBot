@@ -124,7 +124,7 @@ def extract_id(event_id_or_url: int | str) -> int:
     elif isinstance(event_id_or_url, int):
         return event_id_or_url
      
-     return -1
+    return -1
 
 def setup(client):
     client.add_cog(CTFTime(client))
