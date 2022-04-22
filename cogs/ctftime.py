@@ -118,13 +118,17 @@ def retrieve_ctftime_event(event_id: int) -> CTFTimeEvent:
 
 
 def extract_id(event_id_or_url: int | str) -> int:
-    if isinstance(event_id_or_url, str):
-        return int(event_id_or_url.split("/")[-1])
-     
-    elif isinstance(event_id_or_url, int):
-        return event_id_or_url
-     
-    return -1
+    match event_id_or_url:
+        case str():
+            print(event_id_or_url.split("/")[-1])
+            event_id = int(event_id_or_url.split("/")[-1])
+        case int():
+            event_id = event_id_or_url
+        case _:
+            event_id = -1
+
+    return event_id
+
 
 def setup(client):
     client.add_cog(CTFTime(client))

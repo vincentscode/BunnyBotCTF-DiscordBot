@@ -19,7 +19,6 @@ COGS_DIR = "cogs"
 
 # define bot
 intents = discord.Intents().all()
-intents.message_content = True
 client = commands.Bot(command_prefix=PREFIX, intents=intents)
 
 # events
