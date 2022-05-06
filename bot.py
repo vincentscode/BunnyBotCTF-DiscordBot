@@ -7,7 +7,7 @@ import traceback
 import sys
 
 # load config
-with open('config.json', 'r') as f:
+with open('config/config.json', 'r') as f:
     config = json.load(f)
 
 TOKEN = config['token']

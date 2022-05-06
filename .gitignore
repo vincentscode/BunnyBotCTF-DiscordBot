@@ -1,5 +1,5 @@
 # Project specific
-config.json
+config/config.json
 
 # ignore IDE stuff
 .idea
