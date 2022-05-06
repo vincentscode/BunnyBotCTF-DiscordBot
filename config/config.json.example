@@ -1,5 +1,6 @@
 {
   "token": "",
   "prefix": "+",
-  "hello-channel": "nc-bunnybot-1337"
+  "hello-channel": "nc-bunnybot-1337",
+  "send-startup-message": true
 }
