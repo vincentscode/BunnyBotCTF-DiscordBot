@@ -1,4 +1,5 @@
-from typing import List, Dict
+import random
+from typing import List, Dict, Optional
 
 import discord
 from discord.ext import commands
@@ -7,11 +8,14 @@ import datetime as dt
 from dataclasses import dataclass
 import pytz
 
+
 class infoFlags(commands.FlagConverter):
-    event_id: int
-    event_url: str
-    local_timezone: str = "CET"
-    password: str
+    id: Optional[int]
+    url: Optional[str]
+    discord: Optional[str] = "unknown"
+    password: Optional[str]
+    timezone: Optional[str] = "CET"
+
 
 @dataclass
 class CTFTimeEvent:
@@ -33,17 +37,26 @@ class CTFTime(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command("CTFinfo")
-    async def ctf_info(self, ctx: commands.Context,
-                       event_id_or_url: int | str, local_timezone: str = "CET"):
+    @commands.command("CTFinfo", help="flags:\n"
+                                      "id:<CTFtime_id>\n"
+                                      "url:<CTFtime_url>\n"
+                                      "discord:<discord_invite_url>\n"
+                                      "password:<team_password>\n"
+                                      "timezone:<local_timezone>\n"
+                                      "only id or url are mandatory")
+    async def ctf_info(self, ctx: commands.Context, *, flags: infoFlags):
 
-        event_id = extract_id(event_id_or_url)
+        print(flags)
+        if flags.url and not flags.id:
+            flags.id = extract_id(flags.url)
+        if flags.id and not flags.url:
+            flags.url = "https://ctftime.org/event/" + str(flags.id)
 
-        if event_id > 0:
-            ce = retrieve_ctftime_event(event_id)
+        if flags.id > 0:
+            ce = retrieve_ctftime_event(flags.id)
 
             try:
-                tz_object = pytz.timezone(local_timezone)
+                tz_object = pytz.timezone(flags.timezone)
             except pytz.UnknownTimeZoneError:
                 await ctx.send("unknown timezone")
                 tz_object = pytz.timezone("UTC")
@@ -56,14 +69,17 @@ class CTFTime(commands.Cog):
             e.description = f"{ce.description}"
             e.set_thumbnail(url=ce.logo)
             e.add_field(name="website", value=ce.url, inline=True)
-            e.add_field(name="restrictions", value=ce.restrictions, inline=True)
-            e.add_field(name="format", value=ce.challenge_format)
+            e.add_field(name="discord", value=flags.discord, inline=True)
+            e.add_field(name="CTFtime", value=flags.url, inline=True)
             e.add_field(name="start", value=f"{ce.start_date}\n{ce.start_date.tzinfo}")
             e.add_field(name="end", value=f"{ce.end_date}\n{ce.end_date.tzinfo}")
             e.add_field(name="length", value=ce.end_date - ce.start_date, inline=True)
+            e.add_field(name="group password",
+                        value=flags.password if flags.password else generate_password(),
+                        inline=True)
             await ctx.send(embed=e)
         else:
-            await ctx.send("oops something went wrong")
+            await ctx.send("unknown CTFtime id")
 
     @commands.command("CTFregister")
     async def register_ctf(self, ctx: commands.Context, event_id_or_url: int | str):
@@ -125,7 +141,6 @@ def retrieve_ctftime_event(event_id: int) -> CTFTimeEvent:
 def extract_id(event_id_or_url: int | str) -> int:
     match event_id_or_url:
         case str():
-            print(event_id_or_url.split("/")[-1])
             event_id = int(event_id_or_url.split("/")[-1])
         case int():
             event_id = event_id_or_url
@@ -133,6 +148,16 @@ def extract_id(event_id_or_url: int | str) -> int:
             event_id = -1
 
     return event_id
+
+
+def generate_password(length: int = 20) -> str:
+    chr_start = 33
+    chr_end = 126
+    password = ''
+    for _ in range(length):
+        rand_int = random.randint(chr_start, chr_end)
+        password += (chr(rand_int))
+    return password
 
 
 def setup(client):
