@@ -70,7 +70,7 @@ class CTFTime(commands.Cog):
             if not event:
 
                 # safety checks
-                now = round_to_next_15_minutes(dt.datetime.now().astimezone(datetime.now().astimezone().tzinfo))
+                now = round_to_next_15_minutes(dt.datetime.now().astimezone(dt.datetime.now().astimezone().tzinfo))
                 if ce.start_date < now:
                     ce.start_date = now
                 if ce.end_date < now:
