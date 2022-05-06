@@ -7,6 +7,11 @@ import datetime as dt
 from dataclasses import dataclass
 import pytz
 
+class infoFlags(commands.FlagConverter):
+    event_id: int
+    event_url: str
+    local_timezone: str = "CET"
+    password: str
 
 @dataclass
 class CTFTimeEvent:
