@@ -75,7 +75,6 @@ class CTFTime(commands.Cog):
                     ce.start_date = now
                 if now > ce.end_date:
                     await ctx.send("event is already over")
-                    raise Exception("event is already over")
 
                 await ctx.guild.create_scheduled_event(name=ce.title,
                                                        description=ce.description if len(
@@ -83,6 +82,7 @@ class CTFTime(commands.Cog):
                                                        start_time=round_to_next_15_minutes(ce.start_date),
                                                        end_time=round_to_next_15_minutes(ce.end_date),
                                                        location=ce.url)
+                await ctx.send("event created")
             else:
                 await ctx.send("event already exists")
 
