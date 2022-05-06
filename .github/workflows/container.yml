@@ -14,7 +14,7 @@ jobs:
         username: vincentscode
         password: ${{ secrets.GH_TOKEN }}
 
-    - name: Build the hello-world Docker image
+    - name: Build the Docker image
       run: |
         docker build . --tag ghcr.io/vincentscode/bunnybot:latest
         docker run ghcr.io/vincentscode/bunnybot:latest
