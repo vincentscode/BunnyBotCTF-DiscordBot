@@ -7,4 +7,4 @@ RUN python3 -m pip install -r requirements.txt
 
 COPY . .
 
-ENTRYPOINT python3 bot.py
+CMD ["python3", "bot.py"]
