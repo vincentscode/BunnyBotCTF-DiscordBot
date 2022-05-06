@@ -46,7 +46,10 @@ class CTFTime(commands.Cog):
                                       "only id or url are mandatory")
     async def ctf_info(self, ctx: commands.Context, *, flags: infoFlags):
 
-        print(flags)
+        if not flags.url and not flags.id:
+            await ctx.send("give at least the url or id")
+            return
+
         if flags.url and not flags.id:
             flags.id = extract_id(flags.url)
         if flags.id and not flags.url:
@@ -96,6 +99,7 @@ class CTFTime(commands.Cog):
                     ce.start_date = round_to_next_15_minutes(now) + dt.timedelta(minutes=15)
                 if now > ce.end_date:
                     await ctx.send("event is already over")
+                    return
 
                 await ctx.guild.create_scheduled_event(name=ce.title,
                                                        description=ce.description if len(
