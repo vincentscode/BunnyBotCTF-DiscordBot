@@ -71,13 +71,15 @@ class CTFTime(commands.Cog):
 
                 # safety checks
                 now = round_to_next_15_minutes(dt.datetime.now().astimezone(dt.datetime.now().astimezone().tzinfo))
-                if ce.start_date < now:
+                if now > ce.start_date:
                     ce.start_date = now
-                if ce.end_date < now:
-                    ce.end_date = now
+                if now > ce.end_date:
+                    await ctx.send("event is already over")
+                    raise Exception("event is already over")
 
                 await ctx.guild.create_scheduled_event(name=ce.title,
-                                                       description=ce.description,
+                                                       description=ce.description if len(
+                                                           ce.description) < 1000 else ce.description[:997] + '...',
                                                        start_time=round_to_next_15_minutes(ce.start_date),
                                                        end_time=round_to_next_15_minutes(ce.end_date),
                                                        location=ce.url)
@@ -89,7 +91,7 @@ class CTFTime(commands.Cog):
 
 
 def round_to_next_15_minutes(t: dt.datetime) -> dt.datetime:
-    td = dt.timedelta(minutes=15)
+    td = dt.timedelta(minutes=0)
     return t.replace(microsecond=0, second=0, minute=(t.minute // 15) * 15) + td
 
 
