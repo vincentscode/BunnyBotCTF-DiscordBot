@@ -70,9 +70,9 @@ class CTFTime(commands.Cog):
             if not event:
 
                 # safety checks
-                now = round_to_next_15_minutes(dt.datetime.now().astimezone(dt.datetime.now().astimezone().tzinfo))
+                now = dt.datetime.now().astimezone(dt.datetime.now().astimezone().tzinfo)
                 if now > ce.start_date:
-                    ce.start_date = now
+                    ce.start_date = round_to_next_15_minutes(now) + dt.timedelta(minutes=15)
                 if now > ce.end_date:
                     await ctx.send("event is already over")
 
