@@ -1,4 +1,5 @@
 {
   "token": "",
-  "prefix": "+"
+  "prefix": "+",
+  "hello-channel": "nc-bunnybot-1337"
 }
