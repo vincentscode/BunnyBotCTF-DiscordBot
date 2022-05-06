@@ -91,8 +91,7 @@ class CTFTime(commands.Cog):
 
 
 def round_to_next_15_minutes(t: dt.datetime) -> dt.datetime:
-    td = dt.timedelta(minutes=0)
-    return t.replace(microsecond=0, second=0, minute=(t.minute // 15) * 15) + td
+    return t.replace(microsecond=0, second=0, minute=(t.minute // 15) * 15)
 
 
 def retrieve_ctftime_event(event_id: int) -> CTFTimeEvent:
