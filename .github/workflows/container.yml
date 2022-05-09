@@ -31,3 +31,5 @@ jobs:
         builder: ${{ steps.buildx.outputs.name }}
         push: true
         tags: ghcr.io/vincentscode/bunnybot:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
