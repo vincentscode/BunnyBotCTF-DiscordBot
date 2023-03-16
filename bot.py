@@ -11,11 +11,14 @@ import random
 with open('config/config.json', 'r') as f:
     config = json.load(f)
 
-TOKEN = config['token']
-PREFIX = config['prefix']
-HELLO_CHANNEL = config['hello-channel']
-SEND_HELLO_MSG = config['send-startup-message']
+TOKEN = config.get('token', '')
+PREFIX = config.get('prefix', '+')
+HELLO_CHANNEL = config.get('hello-channel', '')
+SEND_HELLO_MSG = config.get('send-startup-message', False)
 COGS_DIR = "cogs"
+
+if not TOKEN:
+    print("token config is missing")
 
 # define bot
 intents = discord.Intents().all()
@@ -28,7 +31,7 @@ async def on_ready():
     await client.change_presence(activity=Game(name="a CTF!"))
     print(f"Logged in as {client.user.name} ({client.user.id})")
     
-    if SEND_HELLO_MSG:
+    if SEND_HELLO_MSG and HELLO_CHANNEL != '':
         for guild in client.guilds:
             channel = list(filter(lambda c: c.name == HELLO_CHANNEL, guild.channels))
             if len(channel) > 0:
