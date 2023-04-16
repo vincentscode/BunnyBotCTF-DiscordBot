@@ -14,7 +14,7 @@ class Mine(commands.Cog):
         self,
         ctx: commands.Context,
         state: discord.Option(str, description="State of the channel", default="mine", choices=["closed", "mine", "locked", "pls ask", "open"]),
-        modify_permissions: discord.Option(bool, name="modify permissions", description="Set permissions for others according to the state", default=False)
+        modify_permissions: discord.Option(bool, description="Set permissions for others according to the state", default=False)
     ):
         states = {
             "mine": StateInfo("Locked", "🔒"),
