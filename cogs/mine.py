@@ -10,7 +10,8 @@ states = {
     "closed": StateInfo("Locked", "🔒"),
     "hints welcome": StateInfo("Hints Welcome", "👀"),
     "pls ask": StateInfo("Please Ask", "🔐"),
-    "open": StateInfo("Open", "🔓")
+    "open": StateInfo("Open", "🔓"),
+    "none": StateInfo("Unmarked", ""),
 }
 
 class Mine(commands.Cog):
