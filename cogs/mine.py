@@ -4,6 +4,14 @@ from discord.ext import commands
 from collections import namedtuple
 
 StateInfo = namedtuple("StateInfo", ["name", "icon"])
+states = {
+    "mine": StateInfo("Locked", "🔒"),
+    "locked": StateInfo("Locked", "🔒"),
+    "closed": StateInfo("Locked", "🔒"),
+    "hints welcome": StateInfo("Hints Welcome", "👀"),
+    "pls ask": StateInfo("Please Ask", "🔐"),
+    "open": StateInfo("Open", "🔓")
+}
 
 class Mine(commands.Cog):
     def __init__(self, client):
@@ -13,21 +21,14 @@ class Mine(commands.Cog):
     async def mine(
         self,
         ctx: commands.Context,
-        state: discord.Option(str, description="State of the channel", default="mine", choices=["closed", "mine", "locked", "pls ask", "open"]),
+        state: discord.Option(str, description="State of the channel", default="mine", choices=list(states.keys())),
         modify_permissions: discord.Option(bool, description="Set permissions for others according to the state", default=False)
     ):
+        global states
+
         if '✅' in ctx.channel.name:
             await ctx.respond("This channel has been marked as completed already.")
             return
-
-        states = {
-            "mine": StateInfo("Locked", "🔒"),
-            "locked": StateInfo("Locked", "🔒"),
-            "closed": StateInfo("Locked", "🔒"),
-            "hints welcome": StateInfo("Hints Welcome", "👀"),
-            "pls ask": StateInfo("Please Ask", "🔐"),
-            "open": StateInfo("Open", "🔓")
-        }
         
         new_name = ctx.channel.name
         new_name = new_name.replace("🔒", "")
