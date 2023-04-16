@@ -8,10 +8,14 @@ class Archive(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command()
-    async def archive(self, ctx: commands.Context, category: discord.CategoryChannel, delete: bool = False):
-        print("archive")
-        await ctx.send("Archiving...")
+    @discord.slash_command(description="Archive a category")
+    async def archive(
+        self,
+        ctx: commands.Context,
+        category: discord.Option(discord.CategoryChannel, name="category", description="Category to archive", required=True),
+        delete: discord.Option(bool, name="delete", description="Should the category be deleted?", required=False, default=False)
+    ):
+        await ctx.respond("Archiving...")
 
         guild: discord.Guild = ctx.guild
         archive_category: discord.CategoryChannel = find(lambda c: c.name.lower() == "archive", guild.categories)
@@ -56,7 +60,7 @@ class Archive(commands.Cog):
         if delete:
             await category.delete(reason="archive")
 
-        await ctx.send(embed=e)
+        await ctx.respond(embed=e)
 
 
 def setup(client):

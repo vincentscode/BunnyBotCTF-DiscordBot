@@ -37,13 +37,7 @@ class CTFTime(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command("CTFinfo", help="flags:\n"
-                                      "id:<CTFtime_id>\n"
-                                      "url:<CTFtime_url>\n"
-                                      "discord:<discord_invite_url>\n"
-                                      "password:<team_password>\n"
-                                      "timezone:<local_timezone>\n"
-                                      "only id or url are mandatory")
+    @discord.slash_command(description="Get info about a CTFtime event")
     async def ctf_info(self, ctx: commands.Context, *, flags: infoFlags):
 
         if not flags.url and not flags.id:

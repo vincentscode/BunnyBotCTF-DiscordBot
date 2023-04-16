@@ -24,7 +24,6 @@ if not TOKEN:
 intents = discord.Intents().all()
 client = commands.Bot(command_prefix=PREFIX, intents=intents)
 
-
 # events
 @client.event
 async def on_ready():

@@ -8,20 +8,24 @@ class Done(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command()
+    @discord.slash_command(description="Mark a channel as completed")
     async def done(self, ctx: commands.Context):
         if '✅' in ctx.channel.name:
-            await ctx.send("This channel has been marked as completed already.")
+            await ctx.respond("This channel has been marked as completed already.")
             return
 
-        await ctx.channel.edit(name = ctx.channel.name + '✅')
+        new_name = ctx.channel.name
+        new_name = new_name.replace("🔒", "")
+        new_name = new_name.replace("🔓", "")
+        new_name = new_name.replace("🔐", "")
+        new_name += '✅'
+        await ctx.channel.edit(name = new_name)
 
         e = discord.Embed()
         e.title = f'✅ Challenge completed'
         e.timestamp = datetime.datetime.now()
-        e.set_author(name=f"{ctx.message.author.name}#{ctx.message.author.discriminator}")
-
-        await ctx.send(embed=e)
+        e.set_author(name=f"{ctx.author.name}#{ctx.author.discriminator}")
+        await ctx.respond(embed=e)
 
 
 def setup(client):
