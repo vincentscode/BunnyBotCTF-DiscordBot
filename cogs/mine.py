@@ -35,6 +35,7 @@ class Mine(commands.Cog):
         new_name = new_name.replace("🔒", "")
         new_name = new_name.replace("🔓", "")
         new_name = new_name.replace("🔐", "")
+        new_name = new_name.replace("👀", "")
         new_name = states[state].icon + new_name
         
         await ctx.channel.edit(
