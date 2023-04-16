@@ -19,7 +19,12 @@ class Done(commands.Cog):
         new_name = new_name.replace("🔓", "")
         new_name = new_name.replace("🔐", "")
         new_name += '✅'
-        await ctx.channel.edit(name = new_name)
+        await ctx.channel.edit(
+            name = new_name,
+            topic = "",
+            reason = f"Channel marked as completed by {ctx.author.name}#{ctx.author.discriminator}",
+            overwrites = {}
+        )
 
         e = discord.Embed()
         e.title = f'✅ Challenge completed'

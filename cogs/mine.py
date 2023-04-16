@@ -16,11 +16,16 @@ class Mine(commands.Cog):
         state: discord.Option(str, description="State of the channel", default="mine", choices=["closed", "mine", "locked", "pls ask", "open"]),
         modify_permissions: discord.Option(bool, description="Set permissions for others according to the state", default=False)
     ):
+        if '✅' in ctx.channel.name:
+            await ctx.respond("This channel has been marked as completed already.")
+            return
+
         states = {
             "mine": StateInfo("Locked", "🔒"),
             "locked": StateInfo("Locked", "🔒"),
             "closed": StateInfo("Locked", "🔒"),
-            "pls ask": StateInfo("Please ask", "🔐"),
+            "hints welcome": StateInfo("Hints Welcome", "👀"),
+            "pls ask": StateInfo("Please Ask", "🔐"),
             "open": StateInfo("Open", "🔓")
         }
         
@@ -36,7 +41,7 @@ class Mine(commands.Cog):
             reason = f"Channel state changed by {ctx.author.name}#{ctx.author.discriminator}",
             overwrites = {
                 ctx.guild.default_role: discord.PermissionOverwrite(
-                    send_messages = state in ["open", "pls ask"]
+                    send_messages = state not in ["mine", "locked", "closed"]
                 ),
                 ctx.author: discord.PermissionOverwrite(
                     send_messages = True
