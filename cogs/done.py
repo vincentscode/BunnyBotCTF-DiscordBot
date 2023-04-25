@@ -19,7 +19,7 @@ class Done(commands.Cog):
         new_name = new_name.replace("🔓", "")
         new_name = new_name.replace("🔐", "")
         new_name = new_name.replace("👀", "")
-        new_name += '✅'
+        new_name = '✅' + new_name
         await ctx.channel.edit(
             name = new_name,
             topic = "",
