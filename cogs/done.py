@@ -14,8 +14,6 @@ class Done(commands.Cog):
             await ctx.respond("This channel has been marked as completed already.")
             return
         
-        await ctx.respond("Marking channel as completed...")
-        
         is_thread = isinstance(ctx.channel, discord.Thread)
 
         new_name = ctx.channel.name
@@ -28,7 +26,6 @@ class Done(commands.Cog):
         reason = f"Channel marked as completed by @{ctx.author.name}"
 
         try:
-            print(ctx.channel.name)
             if not is_thread:
                 await ctx.channel.edit(
                     name = new_name,
@@ -40,7 +37,6 @@ class Done(commands.Cog):
                     name = new_name,
                     reason = reason
                 )
-                print(ctx.channel.name, "renamed")
         except Exception as ex:
             ctx.respond(f"An error occurred: {ex}")
             return
