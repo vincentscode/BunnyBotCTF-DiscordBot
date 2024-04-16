@@ -25,29 +25,26 @@ class Done(commands.Cog):
 
         reason = f"Channel marked as completed by @{ctx.author.name}"
 
-        try:
-            if not is_thread:
-                await ctx.channel.edit(
-                    name = new_name,
-                    topic = "",
-                    reason = reason
-                )
-            else:
-                await ctx.channel.join()
-                x = await ctx.channel.edit(
-                    name = new_name,
-                    reason = reason
-                )
-                print(x)
-        except Exception as ex:
-            ctx.respond(f"An error occurred: {ex}")
-            return
+        await ctx.response.defer()
+        if not is_thread:
+            await ctx.channel.edit(
+                name = new_name,
+                topic = "",
+                reason = reason
+            )
+        else:
+            await ctx.channel.join()
+            await ctx.channel.edit(
+                name = new_name,
+                reason = reason
+            )
 
+        
         e = discord.Embed()
         e.title = f'✅ Challenge completed'
         e.timestamp = datetime.datetime.now()
         e.set_author(name=f"@{ctx.author.name}")
-        await ctx.respond(embed=e)
+        await ctx.followup.send(embed=e)
 
 
 def setup(client):

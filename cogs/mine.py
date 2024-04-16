@@ -43,6 +43,7 @@ class Mine(commands.Cog):
 
         reason = f"Channel state changed by {ctx.author.name}"
 
+        await ctx.response.defer()
         if not is_thread:
             await ctx.channel.edit(
                 name = new_name,
@@ -50,6 +51,7 @@ class Mine(commands.Cog):
                 reason = reason
             )
         else:
+            await ctx.channel.join()
             await ctx.channel.edit(
                 name = new_name,
                 reason = reason
@@ -61,7 +63,7 @@ class Mine(commands.Cog):
             e.set_image(url="https://media.tenor.com/Q8ioGKtuU0oAAAAC/mine-finding-nemo.gif")
         e.timestamp = datetime.datetime.now()
         e.set_author(name=f"@{ctx.author.name}")
-        await ctx.respond(embed=e)
+        await ctx.followup.send(embed=e)
 
 
 def setup(client):
