@@ -18,19 +18,20 @@ class Mine(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @discord.slash_command(description="Mark a channel as locked")
+    @discord.slash_command(description="Mark a channel or thread as locked")
     async def mine(
         self,
         ctx: commands.Context,
-        state: discord.Option(str, description="State of the channel", default="mine", choices=list(states.keys())),
-        modify_permissions: discord.Option(bool, description="Set permissions for others according to the state", default=False)
+        state: discord.Option(str, description="State of the channel", default="mine", choices=list(states.keys()))
     ):
         global states
-
+        
         if '✅' in ctx.channel.name:
             await ctx.respond("This channel has been marked as completed already.")
             return
         
+        is_thread = isinstance(ctx.channel, discord.Thread)
+
         new_name = ctx.channel.name
         new_name = new_name.replace("🔒", "")
         new_name = new_name.replace("🔓", "")
@@ -38,26 +39,28 @@ class Mine(commands.Cog):
         new_name = new_name.replace("👀", "")
         new_name = states[state].icon + new_name
         
-        await ctx.channel.edit(
-            name = new_name,
-            topic = f"State: {states[state].icon} {states[state].name}",
-            reason = f"Channel state changed by {ctx.author.name}#{ctx.author.discriminator}",
-            overwrites = {
-                ctx.guild.default_role: discord.PermissionOverwrite(
-                    send_messages = state not in ["mine", "locked", "closed"]
-                ),
-                ctx.author: discord.PermissionOverwrite(
-                    send_messages = True
-                )
-            } if modify_permissions else None
-        )
+        new_topic = f"State: {states[state].icon} {states[state].name}"
+
+        reason = f"Channel state changed by {ctx.author.name}"
+
+        if not is_thread:
+            await ctx.channel.edit(
+                name = new_name,
+                topic = new_topic,
+                reason = reason
+            )
+        else:
+            await ctx.channel.edit(
+                name = new_name,
+                reason = reason
+            )
 
         e = discord.Embed()
         e.title = f'{states[state].icon} Channel marked as {states[state].name}'
         if state == "mine":
             e.set_image(url="https://media.tenor.com/Q8ioGKtuU0oAAAAC/mine-finding-nemo.gif")
         e.timestamp = datetime.datetime.now()
-        e.set_author(name=f"{ctx.author.name}#{ctx.author.discriminator}")
+        e.set_author(name=f"@{ctx.author.name}")
         await ctx.respond(embed=e)
 
 

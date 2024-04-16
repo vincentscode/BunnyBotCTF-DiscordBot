@@ -13,6 +13,10 @@ class Done(commands.Cog):
         if '✅' in ctx.channel.name:
             await ctx.respond("This channel has been marked as completed already.")
             return
+        
+        await ctx.respond("Marking channel as completed...")
+        
+        is_thread = isinstance(ctx.channel, discord.Thread)
 
         new_name = ctx.channel.name
         new_name = new_name.replace("🔒", "")
@@ -20,17 +24,31 @@ class Done(commands.Cog):
         new_name = new_name.replace("🔐", "")
         new_name = new_name.replace("👀", "")
         new_name = '✅' + new_name
-        await ctx.channel.edit(
-            name = new_name,
-            topic = "",
-            reason = f"Channel marked as completed by {ctx.author.name}#{ctx.author.discriminator}",
-            overwrites = {}
-        )
+
+        reason = f"Channel marked as completed by @{ctx.author.name}"
+
+        try:
+            print(ctx.channel.name)
+            if not is_thread:
+                await ctx.channel.edit(
+                    name = new_name,
+                    topic = "",
+                    reason = reason
+                )
+            else:
+                await ctx.channel.edit(
+                    name = new_name,
+                    reason = reason
+                )
+                print(ctx.channel.name, "renamed")
+        except Exception as ex:
+            ctx.respond(f"An error occurred: {ex}")
+            return
 
         e = discord.Embed()
         e.title = f'✅ Challenge completed'
         e.timestamp = datetime.datetime.now()
-        e.set_author(name=f"{ctx.author.name}#{ctx.author.discriminator}")
+        e.set_author(name=f"@{ctx.author.name}")
         await ctx.respond(embed=e)
 
 

@@ -9,6 +9,7 @@ class Archive(commands.Cog):
         self.client = client
 
     @discord.slash_command(description="Archive a category")
+    @discord.default_permissions(manage_channels=True)
     async def archive(
         self,
         ctx: commands.Context,
