@@ -21,7 +21,7 @@ class Mine(commands.Cog):
     @discord.slash_command(description="Mark a channel or thread as locked")
     async def mine(
         self,
-        ctx: commands.Context,
+        ctx: discord.ApplicationContext,
         state: discord.Option(str, description="State of the channel", default="mine", choices=list(states.keys()))
     ):
         global states

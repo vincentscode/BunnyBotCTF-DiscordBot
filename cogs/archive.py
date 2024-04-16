@@ -12,7 +12,7 @@ class Archive(commands.Cog):
     @discord.default_permissions(manage_channels=True)
     async def archive(
         self,
-        ctx: commands.Context,
+        ctx: discord.ApplicationContext,
         category: discord.Option(discord.CategoryChannel, name="category", description="Category to archive", required=True),
         delete: discord.Option(bool, name="delete", description="Should the category be deleted?", required=False, default=False)
     ):

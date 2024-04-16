@@ -9,7 +9,7 @@ class Done(commands.Cog):
         self.client = client
 
     @discord.slash_command(description="Mark a channel as completed")
-    async def done(self, ctx: commands.Context):
+    async def done(self, ctx: discord.ApplicationContext):
         if '✅' in ctx.channel.name:
             await ctx.respond("This channel has been marked as completed already.")
             return
@@ -33,10 +33,12 @@ class Done(commands.Cog):
                     reason = reason
                 )
             else:
-                await ctx.channel.edit(
+                await ctx.channel.join()
+                x = await ctx.channel.edit(
                     name = new_name,
                     reason = reason
                 )
+                print(x)
         except Exception as ex:
             ctx.respond(f"An error occurred: {ex}")
             return

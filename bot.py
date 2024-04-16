@@ -6,6 +6,13 @@ import os
 import traceback
 import sys
 import random
+import logging
+
+# logging
+logging.basicConfig(level=logging.INFO)
+
+logger = logging.getLogger('discord')
+logger.setLevel(logging.INFO)
 
 # load config
 with open('config/config.json', 'r') as f:
